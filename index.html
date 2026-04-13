@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>风水计算器 | 探索你的五行命运</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #e94560;
+            --accent-light: #ff6b6b;
+            --auxiliary: #0f3460;
+            --bg: #0f0f1a;
+            --text: #f5f5f5;
+            --card-bg: rgba(255,255,255,0.05);
+            --border: rgba(255,255,255,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 0;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        .logo {
+            font-family: 'ZCOOL XiaoWei', serif;
+            font-size: 2.5rem;
+            color: var(--accent);
+            text-shadow: 0 0 30px rgba(233,69,96,0.5);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 4px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 30px 0 50px;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+
+        .hero h1 {
+            font-family: 'ZCOOL XiaoWei', serif;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .input-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.6s ease-out 0.4s both;
+        }
+
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .year-input {
+            flex: 1;
+            min-width: 200px;
+            max-width: 300px;
+        }
+
+        .year-input label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .year-input input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            transition: all 0.3s ease;
+        }
+
+        .year-input input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(233,69,96,0.2);
+        }
+
+        .year-input input::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+
+        .gender-select {
+            display: flex;
+            gap: 15px;
+        }
+
+        .gender-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gender-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .gender-btn.active {
+            border-color: var(--accent);
+            background: rgba(233,69,96,0.2);
+            color: var(--accent);
+            box-shadow: 0 0 20px rgba(233,69,96,0.3);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            max-width: 300px;
+            padding: 18px 40px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .calculate-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(233,69,96,0.4);
+        }
+
+        .results-section {
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .results-section.show {
+            display: grid;
+        }
+
+        .result-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease-out both;
+        }
+
+        .result-card:nth-child(1) { animation-delay: 0.1s; }
+        .result-card:nth-child(2) { animation-delay: 0.2s; }
+        .result-card:nth-child(3) { animation-delay: 0.3s; }
+        .result-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 32px rgba(233,69,96,0.15);
+            border-color: rgba(233,69,96,0.3);
+        }
+
+        .card-title {
+            font-family: 'ZCOOL XiaoWei', serif;
+            font-size: 1.3rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .card-content {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .element-main {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .element-nayin {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.6);
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .bazi-pillars {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .pillar {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+
+        .pillar-label {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 5px;
+        }
+
+        .pillar-value {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .color-swatches {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .color-swatch {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+
+        .color-block {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+        }
+
+        .color-name {
+            font-size: 0.9rem;
+        }
+
+        .lucky-numbers {
+            display: flex;
+            gap: 15px;
+        }
+
+        .lucky-num {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: 12px;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: rgba(255,255,255,0.4);
+            font-size: 0.85rem;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2rem;
+            }
+            .input-section {
+                padding: 20px;
+            }
+            .bazi-pillars {
+                grid-template-columns: 1fr;
+            }
+            .lucky-numbers {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">风水计算器</div>
+            <div class="subtitle">FENG SHUI CALCULATOR</div>
+        </header>
+
+        <section class="hero">
+            <h1>探索你的五行命运</h1>
+        </section>
+
+        <section class="input-section">
+            <div class="input-group">
+                <div class="year-input">
+                    <label>出生年份</label>
+                    <input type="number" id="birthYear" placeholder="例如: 1990" min="1900" max="2025">
+                </div>
+                <div class="gender-select">
+                    <button class="gender-btn active" data-gender="male">男</button>
+                    <button class="gender-btn" data-gender="female">女</button>
+                </div>
+            </div>
+            <button class="calculate-btn" onclick="calculate()">开始计算</button>
+        </section>
+
+        <section class="results-section" id="results">
+            <div class="result-card">
+                <div class="card-title">五行属性</div>
+                <div class="card-content">
+                    <div class="element-main" id="elementMain">-</div>
+                    <div class="element-nayin" id="elementNayin">纳音: -</div>
+                </div>
+            </div>
+            <div class="result-card">
+                <div class="card-title">八字基础</div>
+                <div class="card-content">
+                    <div class="bazi-pillers">
+                        <div class="bazi-pillars" id="baziPillars"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="result-card">
+                <div class="card-title">幸运颜色</div>
+                <div class="card-content">
+                    <div class="color-swatches" id="luckyColors"></div>
+                </div>
+            </div>
+            <div class="result-card">
+                <div class="card-title">幸运数字</div>
+                <div class="card-content">
+                    <div class="lucky-numbers" id="luckyNumbers"></div>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>© 2026 风水计算器 · 仅供娱乐参考</p>
+        </footer>
+    </div>
+
+    <script>
+        const tiangan = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+        const dizhi = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+        const wuxing = ['木', '火', '土', '金', '水'];
+        
+        const nayin = [
+            '海中金', '炉中火', '大林木', '路旁土', '剑锋金',
+            '山头火', '涧下水', '城头土', '白蜡金', '杨柳木',
+            '井泉水', '屋上土', '霹雳火', '松柏木', '长流水',
+            '砂石金', '山下火', '平地木', '壁上土', '金箔金',
+            '覆灯火', '天河水', '大驿土', '钗钏金', '桑柘木',
+            '大溪水', '砂中土', '天上火', '石榴木', '大海水'
+        ];
+
+        const elementColors = {
+            '木': [
+                { name: '翠绿', hex: '#2ecc71' },
+                { name: '青色', hex: '#00cec9' },
+                { name: '碧绿', hex: '#00b894' }
+            ],
+            '火': [
+                { name: '红色', hex: '#e74c3c' },
+                { name: '紫色', hex: '#9b59b6' },
+                { name: '橙红', hex: '#e67e22' }
+            ],
+            '土': [
+                { name: '黄色', hex: '#f1c40f' },
+                { name: '棕色', hex: '#d35400' },
+                { name: '米黄', hex: '#f39c12' }
+            ],
+            '金': [
+                { name: '白色', hex: '#ecf0f1' },
+                { name: '金色', hex: '#f1c40f' },
+                { name: '银色', hex: '#bdc3c7' }
+            ],
+            '水': [
+                { name: '黑色', hex: '#2c3e50' },
+                { name: '蓝色', hex: '#3498db' },
+                { name: '深蓝', hex: '#2980b9' }
+            ]
+        };
+
+        const elementNumbers = {
+            '木': [3, 8],
+            '火': [2, 7],
+            '土': [5, 10],
+            '金': [4, 9],
+            '水': [1, 6]
+        };
+
+        let selectedGender = 'male';
+
+        document.querySelectorAll('.gender-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                selectedGender = this.dataset.gender;
+            });
+        });
+
+        function getTiangan(year) {
+            return (year - 4) % 10;
+        }
+
+        function getDizhi(year) {
+            return (year - 4) % 12;
+        }
+
+        function getElement(tianganIdx) {
+            const idx = Math.floor(tianganIdx / 2);
+            return wuxing[idx];
+        }
+
+        function getNayin(year) {
+            const tianganIdx = getTiangan(year);
+            const dizhiIdx = getDizhi(year);
+            return nayin[(tianganIdx + dizhiIdx) % 30];
+        }
+
+        function getMonthZhi(month) {
+            return dizhi[(month - 1) % 12];
+        }
+
+        function getMonthGan(year, month) {
+            const yearGan = getTiangan(year);
+            const monthGan = (yearGan * 2 + month) % 10;
+            return tiangan[monthGan];
+        }
+
+        function calculate() {
+            const yearInput = document.getElementById('birthYear');
+            const year = parseInt(yearInput.value);
+
+            if (!year || year < 1900 || year > 2025) {
+                alert('请输入1900-2025之间的有效年份');
+                return;
+            }
+
+            const tianganIdx = getTiangan(year);
+            const dizhiIdx = getDizhi(year);
+            const element = getElement(tianganIdx);
+            const nayinStr = getNayin(year);
+
+            const month = new Date().getMonth() + 1;
+            const monthGan = getMonthGan(year, month);
+            const monthZhi = getMonthZhi(month);
+
+            document.getElementById('elementMain').textContent = element;
+            document.getElementById('elementNayin').textContent = '纳音: ' + nayinStr;
+
+            const pillarsHtml = `
+                <div class="pillar">
+                    <div class="pillar-label">年柱</div>
+                    <div class="pillar-value">${tiangan[tianganIdx]}${dizhi[dizhiIdx]}</div>
+                </div>
+                <div class="pillar">
+                    <div class="pillar-label">月柱</div>
+                    <div class="pillar-value">${monthGan}${monthZhi}</div>
+                </div>
+            `;
+            document.getElementById('baziPillars').innerHTML = pillarsHtml;
+
+            const colors = elementColors[element];
+            const colorsHtml = colors.map(c => `
+                <div class="color-swatch">
+                    <div class="color-block" style="background: ${c.hex}"></div>
+                    <span class="color-name">${c.name}</span>
+                </div>
+            `).join('');
+            document.getElementById('luckyColors').innerHTML = colorsHtml;
+
+            const numbers = elementNumbers[element];
+            const numbersHtml = numbers.map(n => `<div class="lucky-num">${n}</div>`).join('');
+            document.getElementById('luckyNumbers').innerHTML = numbersHtml;
+
+            document.getElementById('results').classList.add('show');
+        }
+
+        document.getElementById('birthYear').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculate();
+            }
+        });
+    </script>
+</body>
+</html>
